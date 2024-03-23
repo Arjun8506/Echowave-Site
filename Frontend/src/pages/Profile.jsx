@@ -1,27 +1,30 @@
 import React, { useState, useRef } from "react";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useAuthContext } from "../context/authContext";
+import { MdChangeCircle } from "react-icons/md";
+import { useNavigate } from "react-router-dom";
 
 const Profile = () => {
   const [isVisible, setIsVisible] = useState(false);
   const fileRef = useRef();
   const [file, setfile] = useState(null);
 
-  console.log(file);
+  const {authUser, setauthUser} = useAuthContext()
+  const navigate = useNavigate()
 
   const toggleVisibility = () => {
     setIsVisible(!isVisible);
   };
 
   const copyURL = () => {
-    // Get the current URL
     const url = window.location.href;
-
-    // Copy the URL to the clipboard
     navigator.clipboard.writeText(url)
       .then(() => {
-        alert('URL copied to clipboard');
+        toast.success("URL Copied")
       })
       .catch((error) => {
-        console.error('Error copying URL: ', error);
+        toast.error(error.message)
       });
   };
 
@@ -42,6 +45,29 @@ const Profile = () => {
     console.log(formData);
   };
 
+  const handleLogout = async () => {
+    try {
+      const res = await fetch("/api/auth/logout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" }
+      });
+      const data = await res.json();
+      if (data.success === false) {
+       console.log(data.message);
+        toast.error(data.message);
+        return;
+      }
+      localStorage.removeItem("chat-user")
+      setauthUser(null)
+
+      toast.success(data.message);
+      navigate("/login")
+    } catch (error) {
+      console.log(error.message);
+      toast.error(error.message)
+    }
+  }
+
   return (
     <div className="w-full pl-[20vw] overflow-hidden  lg:pl-[22vw] py-5">
       <div
@@ -52,21 +78,26 @@ const Profile = () => {
       </div>
       <div className="flex flex-col items-center lg:flex-row lg:items-start">
        {isVisible ? (
-         <img
-         className="w-56 h-56 object-cover border-[1px] border-zinc-400 rounded-full hover:opacity-60 cursor-pointer"
-         src="https://i.pinimg.com/564x/72/27/bb/7227bb6cd6cd58f9ccbb009b158605b2.jpg"
-         alt="profile"
-         onClick={() => fileRef.current.click()}
-       />
+        <div className="relative">
+          <img
+          className="w-56 h-56 object-cover border-[1px] border-zinc-400 rounded-full hover:opacity-60 cursor-pointer"
+          src={authUser.profilePic}
+          onClick={() => fileRef.current.click()}
+        />
+        <MdChangeCircle className="absolute bottom-6 right-0 text-3xl" />
+        </div>
        ) : (
         <img
         className="w-56 h-56 object-cover border-[1px] border-zinc-400 rounded-full"
-        src="https://i.pinimg.com/564x/72/27/bb/7227bb6cd6cd58f9ccbb009b158605b2.jpg"
+        src={authUser.profilePic}
         alt="profile"
       />
        )}
         <div className="flex flex-col">
-          <div className="flex my-10 mx-16 gap-5">
+          <div className="text-center my-4 text-2xl" id="logofont">
+            <h1>{authUser.username}</h1>
+          </div>
+          <div className="flex my-4 mx-16 gap-5">
             <div className="flex flex-col items-center">
               <h1>6</h1>
               <h1>Posts</h1>
@@ -96,10 +127,13 @@ const Profile = () => {
               share Profile
             </button>
           </div>
+          <div className="flex items-center justify-center my-4">
+          <button onClick={handleLogout}  type="button" className="bg-red-500 text-white p-2 px-4 capitalize rounded-lg hover:opacity-90 ">Logout</button>
+          </div>
         </div>
       </div>
       {isVisible && (
-        <div className="w-[40vw] my-5 mx-auto  flex flex-col gap-4 rounded-lg">
+        <div className="w-[50vw] my-5 mx-auto  flex flex-col gap-4 rounded-lg">
           <div className="flex items-center gap-3">
             <div className="w-[45%]  border-[1px] border-zinc-400"></div>
             <p className="text-zinc-700 text-lg uppercase">Edit</p>
@@ -112,6 +146,7 @@ const Profile = () => {
               id="email"
               placeholder="Email ID"
               className="w-full border-[1px] rounded-lg border-zinc-500 p-2 text-[14px] focus:outline-none"
+              value={authUser.email}
               disabled={true}
             />
             <input
@@ -119,6 +154,7 @@ const Profile = () => {
               id="fullname"
               placeholder="Full Name"
               className="w-full border-[1px] rounded-lg border-zinc-500 p-2 text-[14px] focus:outline-none"
+              value={authUser.fullname}
               disabled={true}
             />
             <input
@@ -149,6 +185,7 @@ const Profile = () => {
           </form>
         </div>
       )}
+      
     </div>
   );
 };

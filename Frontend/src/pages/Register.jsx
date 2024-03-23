@@ -1,13 +1,20 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useNavigate } from "react-router-dom";
 
 const Register = () => {
   const [formData, setformData] = useState({
     email: "",
     fullname: "",
     username: "",
-    password: ""
+    password: "",
   });
+  const [loading, setloading] = useState(false);
+  const [errorGot, seterrorGot] = useState(null);
+
+  const navigate = useNavigate()
 
   const handleInputChange = (e) => {
     setformData({
@@ -16,23 +23,51 @@ const Register = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     console.log(formData);
+
+    try {
+      setloading(true);
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+      const data = await res.json();
+      if (data.success === false) {
+        seterrorGot(data.message);
+        setloading(false);
+        toast.error(data.message);
+        return;
+      }
+      setloading(false);
+      seterrorGot(null);
+      toast.success(data.message);
+      navigate("/login")
+    } catch (error) {
+      console.log(error);
+      seterrorGot(error.message);
+      setloading(false);
+      toast.error(error.message);
+    }
   };
 
   return (
     <div className="w-full min-h-screen px-10 py-4">
-      <div className="w-full min-h-screen md:w-[80%] lg:w-[40%]  md:mx-auto  border-[1px] border-zinc-400  flex flex-col gap-4 p-8 rounded-lg">
-        <div className="flex gap-2">
-      <img src="../../logo.png" alt="Logo" className="w-14 h-14 rounded-full" />
-        <h1
-          className="font-bold text-6xl text-center text-slate-800"
-          id="logofont"
-        >
-          EchoWave
-        </h1>
-
+      <div className="w-full md:w-[80%] lg:w-[40%] my-auto  md:mx-auto md:my-auto border-[1px] border-zinc-400  flex flex-col gap-4 p-4 lg:p-8 rounded-lg">
+        <div className="flex gap-2 items-center">
+          <img
+            src="../../logo.png"
+            alt="Logo"
+            className="w-14 h-14 rounded-full"
+          />
+          <h1
+            className="font-bold text-3xl lg:text-6xl text-center text-slate-800"
+            id="logofont"
+          >
+            EchoWave
+          </h1>
         </div>
         <p className="text-zinc-700 text-center text-sm">
           Register to see photos and videos <br /> from your friends.
@@ -86,13 +121,28 @@ const Register = () => {
             Policy .
           </p>
 
-          <button className="bg-blue-500 text-white py-1 rounded-lg hover:opacity-90">
-            Register
+          <button
+            className="bg-blue-500 text-white py-1 rounded-lg hover:opacity-90 disabled:opacity-50"
+            disabled={loading}
+          >
+            {loading ? "Loading..." : "Register"}
           </button>
         </form>
 
+        {errorGot ? (
+          <p className="text-red-600 text-center text-[16px]">{errorGot}</p>
+        ) : (
+          ""
+        )}
+
         <p className="text-[14px] capitalize text-zinc-700 ">
-          Have an account <Link to={"/login"} className="text-blue-900 underline hover:opacity-90">Log In</Link>
+          Have an account{" "}
+          <Link
+            to={"/login"}
+            className="text-blue-900 underline hover:opacity-90"
+          >
+            Log In
+          </Link>
         </p>
       </div>
     </div>
