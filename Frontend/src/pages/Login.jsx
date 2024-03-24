@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useAuthContext } from "../context/authContext";
+import GoogleAuth from "../components/GoogleAuth";
 
 const Login = () => {
 
@@ -26,7 +27,6 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
 
     try {
       setloading(true);
@@ -51,7 +51,6 @@ const Login = () => {
       toast.success(data.message);
       navigate("/")
     } catch (error) {
-      console.log(error);
       seterrorGot(error.message);
       setloading(false);
       toast.error(error.message);
@@ -104,6 +103,8 @@ const Login = () => {
             {loading ? "Loading..." : "Log In"}
           </button>
         </form>
+
+        <GoogleAuth />
 
         {errorGot ? (
           <p className="text-red-600 text-center text-[16px]">{errorGot}</p>

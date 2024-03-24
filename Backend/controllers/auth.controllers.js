@@ -42,7 +42,7 @@ export const loginUser = async (req, res, next) => {
         const token = await jwt.sign({ id: validUser._id }, process.env.JWT_SECRET, { expiresIn: '15d' })
         res.cookie("SocialMedia-Cookie", token, { maxAge: 15 * 24 * 60 * 60 * 1000, httpOnly: true }).status(200).json({
             success: true,
-            statusCode: 200, 
+            statusCode: 200,
             user: validUser
         })
     } catch (error) {
@@ -55,6 +55,56 @@ export const logoutUser = async (req, res, next) => {
         res.clearCookie("SocialMedia-Cookie")
         res.cookie("loggedOut", "", { maxAge: 0 })
         res.status(200).json("Loggedout Successfully")
+    } catch (error) {
+        next(error)
+    }
+}
+
+export const googleAuth = async (req, res, next) => {
+    try {
+        const randomStr = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        const { fullname, email, profilePic } = req.body
+        console.log(req.body);
+
+        const user = await User.findOne({ email: email })
+        if (user) {
+            console.log("found");
+            const token = await jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '15d' })
+            res.cookie("SocialMedia-Cookie", token, { maxAge: 15 * 24 * 60 * 60 * 1000, httpOnly: true }).status(200).json({
+                success: true,
+                statusCode: 200,
+                user: user
+            })
+        }
+        if (!user) {
+            console.log("not found");
+            const username = fullname.replace(/ /g, "") + Math.floor(Math.random() * 10000)
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+{}|[];\':"<>?,./';
+
+            let password = '';
+            for (let i = 0; i < 9; i++) {
+                const randomIndex = Math.floor(Math.random() * chars.length);
+                password += chars[randomIndex];
+            }
+            console.log(password)
+            const hashedPassword = bcryptjs.hashSync(password, 10)
+
+            const newUser = new User({
+                fullname: fullname,
+                username: username,
+                email: email,
+                password: hashedPassword,
+                profilePic: profilePic
+            })
+            await newUser.save()
+
+            const token = await jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, { expiresIn: '15d' })
+            res.cookie("SocialMedia-Cookie", token, { maxAge: 15 * 24 * 60 * 60 * 1000, httpOnly: true }).status(200).json({
+                success: true,
+                statusCode: 200,
+                user: newUser
+            })
+        }
     } catch (error) {
         next(error)
     }

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
+import GoogleAuth from "../components/GoogleAuth";
 
 const Register = () => {
   const [formData, setformData] = useState({
@@ -128,6 +129,8 @@ const Register = () => {
             {loading ? "Loading..." : "Register"}
           </button>
         </form>
+
+        <GoogleAuth />
 
         {errorGot ? (
           <p className="text-red-600 text-center text-[16px]">{errorGot}</p>

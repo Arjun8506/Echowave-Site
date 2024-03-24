@@ -1,17 +1,26 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useAuthContext } from "../context/authContext";
 import { MdChangeCircle } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
+import {
+  getDownloadURL,
+  getStorage,
+  ref,
+  uploadBytesResumable,
+} from "firebase/storage";
+import app from "../../firebase";
 
 const Profile = () => {
   const [isVisible, setIsVisible] = useState(false);
   const fileRef = useRef();
   const [file, setfile] = useState(null);
+  const [fileUploadPerc, setfileUploadPerc] = useState(0);
+  const [uploadError, setuploadError] = useState(null);
 
-  const {authUser, setauthUser} = useAuthContext()
-  const navigate = useNavigate()
+  const { authUser, setauthUser } = useAuthContext();
+  const navigate = useNavigate();
 
   const toggleVisibility = () => {
     setIsVisible(!isVisible);
@@ -19,18 +28,20 @@ const Profile = () => {
 
   const copyURL = () => {
     const url = window.location.href;
-    navigator.clipboard.writeText(url)
+    navigator.clipboard
+      .writeText(url)
       .then(() => {
-        toast.success("URL Copied")
+        toast.success("URL Copied");
       })
       .catch((error) => {
-        toast.error(error.message)
+        toast.error(error.message);
       });
   };
 
   const [formData, setformData] = useState({
     username: "",
     password: "",
+    profilePic: ""
   });
 
   const handleInputChange = (e) => {
@@ -49,24 +60,61 @@ const Profile = () => {
     try {
       const res = await fetch("/api/auth/logout", {
         method: "POST",
-        headers: { "Content-Type": "application/json" }
+        headers: { "Content-Type": "application/json" },
       });
       const data = await res.json();
       if (data.success === false) {
-       console.log(data.message);
+        console.log(data.message);
         toast.error(data.message);
         return;
       }
-      localStorage.removeItem("chat-user")
-      setauthUser(null)
+      localStorage.removeItem("chat-user");
+      setauthUser(null);
 
       toast.success(data.message);
-      navigate("/login")
+      navigate("/login");
     } catch (error) {
       console.log(error.message);
-      toast.error(error.message)
+      toast.error(error.message);
     }
-  }
+  };
+
+  useEffect(() => {
+    if (file) {
+      handleUploadImage(file);
+    }
+  }, [file]);
+
+  const handleUploadImage = (file) => {
+    const storage = getStorage(app);
+    const filename = new Date().getTime() + file.name;
+    const storageRef = ref(storage, filename);
+    const uploadTask = uploadBytesResumable(storageRef, file);
+
+    uploadTask.on(
+      "state_changed",
+      (snapshot) => {
+        const progress =
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        setfileUploadPerc(progress);
+      },
+      (error) => {
+        setuploadError(error.message);
+      },
+      () => {
+        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+          console.log(downloadURL);
+          setformData({
+            ...formData, profilePic: downloadURL
+          })
+        });
+      }
+    );
+  };
+
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+  };
 
   return (
     <div className="w-full pl-[20vw] overflow-hidden  lg:pl-[22vw] py-5">
@@ -77,22 +125,32 @@ const Profile = () => {
         Profile
       </div>
       <div className="flex flex-col items-center lg:flex-row lg:items-start">
-       {isVisible ? (
-        <div className="relative">
+        {isVisible ? (
+          <div className="relative">
+            <img
+              className="w-56 h-56 object-cover border-[1px] border-zinc-400 rounded-full hover:opacity-60 cursor-pointer"
+              src={formData.profilePic || authUser.profilePic}
+              onClick={() => fileRef.current.click()}
+            />
+            <MdChangeCircle className="absolute bottom-6 right-0 text-3xl" />
+            {fileUploadPerc ? (
+              <p className="text-[14px] text-green-400 text-center">
+                {fileUploadPerc}
+              </p>
+            ) : (
+              ""
+            )}
+
+            {uploadError ? <p className="text-[14px] text-red-400 text-center">{uploadError}</p> : ""}
+
+          </div>
+        ) : (
           <img
-          className="w-56 h-56 object-cover border-[1px] border-zinc-400 rounded-full hover:opacity-60 cursor-pointer"
-          src={authUser.profilePic}
-          onClick={() => fileRef.current.click()}
-        />
-        <MdChangeCircle className="absolute bottom-6 right-0 text-3xl" />
-        </div>
-       ) : (
-        <img
-        className="w-56 h-56 object-cover border-[1px] border-zinc-400 rounded-full"
-        src={authUser.profilePic}
-        alt="profile"
-      />
-       )}
+            className="w-56 h-56 object-cover border-[1px] border-zinc-400 rounded-full"
+            src={authUser.profilePic}
+            alt="profile"
+          />
+        )}
         <div className="flex flex-col">
           <div className="text-center my-4 text-2xl" id="logofont">
             <h1>{authUser.username}</h1>
@@ -128,7 +186,13 @@ const Profile = () => {
             </button>
           </div>
           <div className="flex items-center justify-center my-4">
-          <button onClick={handleLogout}  type="button" className="bg-red-500 text-white p-2 px-4 capitalize rounded-lg hover:opacity-90 ">Logout</button>
+            <button
+              onClick={handleLogout}
+              type="button"
+              className="bg-red-500 text-white p-2 px-4 capitalize rounded-lg hover:opacity-90 "
+            >
+              Logout
+            </button>
           </div>
         </div>
       </div>
@@ -178,14 +242,16 @@ const Profile = () => {
               Register
             </button>
 
-            <input type="file" id="profile" ref={fileRef} 
-            onChange={(e) => setfile(e.target.files[0])}
-            hidden
+            <input
+              type="file"
+              id="profile"
+              ref={fileRef}
+              onChange={(e) => setfile(e.target.files[0])}
+              hidden
             />
           </form>
         </div>
       )}
-      
     </div>
   );
 };
