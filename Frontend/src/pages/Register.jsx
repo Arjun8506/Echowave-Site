@@ -15,7 +15,7 @@ const Register = () => {
   const [loading, setloading] = useState(false);
   const [errorGot, seterrorGot] = useState(null);
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const handleInputChange = (e) => {
     setformData({
@@ -26,7 +26,6 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
 
     try {
       setloading(true);
@@ -45,9 +44,8 @@ const Register = () => {
       setloading(false);
       seterrorGot(null);
       toast.success(data.message);
-      navigate("/login")
+      navigate("/login");
     } catch (error) {
-      console.log(error);
       seterrorGot(error.message);
       setloading(false);
       toast.error(error.message);
@@ -55,9 +53,9 @@ const Register = () => {
   };
 
   return (
-    <div className="w-full min-h-screen px-10 py-4">
+    <div className="w-full min-h-screen md:px-10 py-4 px-4">
       <div className="w-full md:w-[80%] lg:w-[40%] my-auto  md:mx-auto md:my-auto border-[1px] border-zinc-400  flex flex-col gap-4 p-4 lg:p-8 rounded-lg">
-        <div className="flex gap-2 items-center">
+        <div className="flex gap-2 items-center mx-auto">
           <img
             src="../../logo.png"
             alt="Logo"
@@ -123,7 +121,7 @@ const Register = () => {
           </p>
 
           <button
-            className="bg-blue-500 text-white py-1 rounded-lg hover:opacity-90 disabled:opacity-50"
+            className="bg-blue-500 font-bold text-white py-1 rounded-lg hover:opacity-90 disabled:opacity-50"
             disabled={loading}
           >
             {loading ? "Loading..." : "Register"}

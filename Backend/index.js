@@ -1,9 +1,13 @@
 import express, { json } from "express"
 import dotenv from 'dotenv'
 import cors from 'cors'
+import cookieParser from "cookie-parser"
 
 import ConnectDB from "./connectDB/connectDB.js"
 import authRoutes from './routes/auth.routes.js'
+import postRoutes from './routes/post.routes.js'
+import userRoutes from './routes/user.routes.js'
+import messageRoutes from "./routes/message.routes.js"
 
 dotenv.config()
 
@@ -12,8 +16,15 @@ const Port = process.env.PORT
 
 app.use(express.json())
 app.use(cors())
+app.use(cookieParser())
 
 app.use("/api/auth", authRoutes)
+
+app.use("/api/post", postRoutes)
+
+app.use("/api/user", userRoutes)
+
+app.use("/api/message", messageRoutes)
 
 app.listen(Port, ()=> {
     ConnectDB()

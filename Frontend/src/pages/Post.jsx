@@ -4,21 +4,32 @@ import {
   ref,
   uploadBytesResumable,
 } from "firebase/storage";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FaPlus } from "react-icons/fa";
 import app from "../../firebase";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Spinner from "../components/Spinner";
+import { useAuthContext } from "../context/authContext";
+import { useNavigate } from "react-router-dom";
 
 const Post = () => {
+  const { authUser } = useAuthContext();
+
   const [files, setfiles] = useState([]);
   const fileref = useRef();
   const [imageURLs, setimageURLs] = useState([]);
-  const [loading, setloading] = useState(false)
+  const [loading, setloading] = useState(false);
+  const [loadingwhileSubmiting, setloadingwhileSubmiting] = useState(false);
+  const navigate = useNavigate()
 
-  console.log(imageURLs);
+  const [formData, setformData] = useState({
+    caption: "",
+    description: "",
+    images: [],
+  });
 
-  const handleFormSubmit = (e) => {
+  const handleImageSubmit = (e) => {
     e.preventDefault();
     if (files.length > 0 && files.length < 11) {
       const promises = [];
@@ -31,7 +42,15 @@ const Post = () => {
     }
   };
 
+  useEffect(() => {
+    setformData((prevData) => ({
+      ...prevData,
+      images: imageURLs,
+    }));
+  }, [imageURLs]);
+
   const storeImage = async (file) => {
+    setloading(true);
     return new Promise((resolve, reject) => {
       const storage = getStorage(app);
       const filename = new Date().getTime() + file.name;
@@ -46,23 +65,61 @@ const Post = () => {
           console.log(progress);
         },
         (error) => {
+          setloading(false);
           console.log(error.message);
-          toast.error("You can only upload 10 images or less and size less than 2MB", error.message)
+          toast.error(
+            "You can only upload 10 images or less and size less than 4MB",
+            error.message
+          );
         },
         () => {
           getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
             resolve(downloadURL);
           });
+          setloading(false);
         }
       );
     });
   };
 
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      setloadingwhileSubmiting(true);
+      const res = await fetch(`/api/post/create/${authUser._id}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData)
+      });
+
+      const data = await res.json()
+      if (data.success === false) {
+        setloadingwhileSubmiting(false)
+        toast.error(data.message)
+        return
+      }
+      setloadingwhileSubmiting(false)
+      toast.success(data.message)
+      navigate("/profile")
+    } catch (error) {
+      setloadingwhileSubmiting(false)
+      toast.error(error.message);
+    }
+  };
+
+  const handleDeleteImage = (index) => {
+    const updatedImageURLs = [...imageURLs];
+    updatedImageURLs.splice(index, 1); // Remove the image URL at the specified index
+    setimageURLs(updatedImageURLs); // Update the state with the new array
+  };
+
   return (
-    <div className="w-[80vw] ml-[18vw] py-5 px-8">
-      <div className="font-bold text-4xl mb-5" id="logofont">
+    <div className="px-2 md:w-[80vw] md:ml-[18vw] md:pt-6 py-5 md:px-8 mb-10">
+      <div className="font-bold text-4xl mb-5 px-2" id="logofont">
         POST
       </div>
+
       <div className=" border-[1px] border-zinc-400 py-16 rounded-lg">
         <div
           onClick={() => fileref.current.click()}
@@ -84,22 +141,69 @@ const Post = () => {
           }}
         />
         <button
-          onClick={handleFormSubmit}
+          onClick={handleImageSubmit}
           type="button"
-          className="w-full p-2 uppercase bg-green-400 rounded-lg my-4"
+          className="w-full p-2 uppercase bg-gray-600 text-white rounded-lg my-4 disabled:opacity-50 hover:opacity-90 font-bold "
+          disabled={loading}
         >
-          Upload To Preview
+          {loading ? <Spinner /> : "Upload To Preview"}
+        </button>
+        <div className="w-full flex flex-col gap-4">
+          <input
+            type="text"
+            id="caption"
+            placeholder="Caption Goes Here...."
+            className="border-b-[1px] border-b-zinc-400 focus:outline-none p-2"
+            value={formData.caption}
+            onChange={(e) =>
+              setformData((prevData) => ({
+                ...prevData,
+                caption: e.target.value,
+              }))
+            }
+          />
+          <textarea
+            id="description"
+            placeholder="Description ang Hashtags Goes Here...."
+            className="h-32 border-b-[1px] border-b-zinc-400 focus:outline-none p-2 mb-4"
+            value={formData.description}
+            onChange={(e) =>
+              setformData((prevData) => ({
+                ...prevData,
+                description: e.target.value,
+              }))
+            }
+          />
+        </div>
+        <h1 className="font-bold underline mb-4 uppercase">Preview</h1>
+        {imageURLs &&
+          imageURLs.length > 0 &&
+          imageURLs.map((url, index) => (
+            <div
+              className=" flex justify-between items-center w-full h-20 my-4 p-2 border-2 border-zinc-500 rounded-lg"
+              key={index}
+            >
+              <img
+                className="w-16 h-16 object-cover rounded-lg"
+                src={url}
+                alt={`Image ${index}`}
+              />
+              <button
+                onClick={() => handleDeleteImage(index)}
+                className="bg-red-500 text-white p-1 px-2 rounded-lg hover:opacity-80"
+              >
+                Delete
+              </button>
+            </div>
+          ))}
+        <button
+          onClick={handleFormSubmit}
+          className="w-full p-2 uppercase bg-gray-900 text-white rounded-lg my-4 disabled:opacity-50 hover:opacity-90 font-bold "
+          disabled={loadingwhileSubmiting}
+        >
+          {loadingwhileSubmiting ? <Spinner /> : "post"}
         </button>
       </form>
-          <h1 className="font-bold underline mb-4 uppercase">Preview</h1>
-      {imageURLs &&
-        imageURLs.length > 0 &&
-        imageURLs.map((url, index) => (
-          <div className=" flex justify-between items-center w-full h-20 my-4 p-2 border-2 border-zinc-500 rounded-lg" key={index}>
-            <img className="w-16 h-16 object-cover rounded-lg"  src={url} alt={`Image ${index}`} />
-            <button className="bg-red-500 text-white p-1 px-2 rounded-lg hover:opacity-80">Delete</button>
-          </div>
-        ))}
     </div>
   );
 };

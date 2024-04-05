@@ -3,7 +3,7 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useAuthContext } from "../context/authContext";
 import { MdChangeCircle } from "react-icons/md";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   getDownloadURL,
   getStorage,
@@ -11,6 +11,8 @@ import {
   uploadBytesResumable,
 } from "firebase/storage";
 import app from "../../firebase";
+import { MdOutlineDeleteForever } from "react-icons/md";
+import Spinner from "../components/Spinner";
 
 const Profile = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -19,8 +21,10 @@ const Profile = () => {
   const [fileUploadPerc, setfileUploadPerc] = useState(0);
   const [uploadError, setuploadError] = useState(null);
 
-  const { authUser, setauthUser } = useAuthContext();
+  const { authUser, setauthUser, updateUser } = useAuthContext();
   const navigate = useNavigate();
+  const [userPosts, setuserPosts] = useState([]);
+  const [loading, setloading] = useState(false);
 
   const toggleVisibility = () => {
     setIsVisible(!isVisible);
@@ -38,22 +42,60 @@ const Profile = () => {
       });
   };
 
+  const handleDeletePost = async ({ post }) => {
+    var confirmDelete = window.confirm(
+      "Are you sure you want to delete this post?"
+    );
+    if (confirmDelete) {
+      try {
+        const res = await fetch(`/api/post/deletepost/${post._id}`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        const data = await res.json();
+        if (data.success === false) {
+          toast.error(data.message);
+          return;
+        }
+        toast.success("Deletion Successful!");
+      } catch (error) {
+        toast.error(error.message);
+      }
+    } else {
+      toast.success("Deletion Canceled!");
+    }
+  };
+
   const [formData, setformData] = useState({
     username: "",
     password: "",
-    profilePic: ""
+    profilePic: "",
   });
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await fetch(`/api/post/getposts/${authUser._id}`);
+        const data = await res.json();
+        setuserPosts(data.posts);
+      } catch (error) {
+        toast.error(error.message);
+      }
+    };
+
+    if (authUser && authUser._id) {
+      // Check if authUser and authUser._id exist
+      fetchData();
+    }
+  }, [authUser]);
 
   const handleInputChange = (e) => {
     setformData({
       ...formData,
       [e.target.id]: e.target.value,
     });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log(formData);
   };
 
   const handleLogout = async () => {
@@ -64,7 +106,6 @@ const Profile = () => {
       });
       const data = await res.json();
       if (data.success === false) {
-        console.log(data.message);
         toast.error(data.message);
         return;
       }
@@ -74,7 +115,6 @@ const Profile = () => {
       toast.success(data.message);
       navigate("/login");
     } catch (error) {
-      console.log(error.message);
       toast.error(error.message);
     }
   };
@@ -103,10 +143,10 @@ const Profile = () => {
       },
       () => {
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          console.log(downloadURL);
           setformData({
-            ...formData, profilePic: downloadURL
-          })
+            ...formData,
+            profilePic: downloadURL,
+          });
         });
       }
     );
@@ -114,12 +154,42 @@ const Profile = () => {
 
   const handleUpdate = async (e) => {
     e.preventDefault();
+    try {
+      setloading(true);
+      const res = await fetch("/api/user/updateuser", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData)
+      });
+      const data = await res.json()
+      if (data.success === false) {
+        setloading(false)
+        toast.error(data.message);
+        return;
+      }
+      setloading(false)
+      console.log(data);
+      localStorage.setItem('chat-user', JSON.stringify(data.user));
+      const updatedUserData = { 
+        username: data.user.username,
+        password: data.user.password,
+        profilePic: data.user.profilePic
+       }
+      updateUser(updatedUserData)
+       navigate("/")
+    } catch (error) {
+      console.log(error);
+      setloading(false);
+      toast.error(error.message);
+    }
   };
 
   return (
-    <div className="w-full pl-[20vw] overflow-hidden  lg:pl-[22vw] py-5">
+    <div className="w-full overflow-hidden  lg:pl-[20vw] py-5">
       <div
-        className="font-bold text-4xl mb-5 uppercase text-center md:text-start"
+        className=" font-bold text-4xl mb-5 uppercase text-center md:text-start"
         id="logofont"
       >
         Profile
@@ -128,7 +198,7 @@ const Profile = () => {
         {isVisible ? (
           <div className="relative">
             <img
-              className="w-56 h-56 object-cover border-[1px] border-zinc-400 rounded-full hover:opacity-60 cursor-pointer"
+              className="w-40 h-40 object-cover border-[1px] border-zinc-400 rounded-full hover:opacity-60 cursor-pointer"
               src={formData.profilePic || authUser.profilePic}
               onClick={() => fileRef.current.click()}
             />
@@ -141,21 +211,26 @@ const Profile = () => {
               ""
             )}
 
-            {uploadError ? <p className="text-[14px] text-red-400 text-center">{uploadError}</p> : ""}
-
+            {uploadError ? (
+              <p className="text-[14px] text-red-400 text-center">
+                {uploadError}
+              </p>
+            ) : (
+              ""
+            )}
           </div>
         ) : (
           <img
-            className="w-56 h-56 object-cover border-[1px] border-zinc-400 rounded-full"
+            className="w-40 h-40 object-cover border-[1px] border-zinc-400 rounded-full"
             src={authUser.profilePic}
             alt="profile"
           />
         )}
         <div className="flex flex-col">
-          <div className="text-center my-4 text-2xl" id="logofont">
+          <div className="text-center my-2 text-2xl" id="logofont">
             <h1>{authUser.username}</h1>
           </div>
-          <div className="flex my-4 mx-16 gap-5">
+          <div className="flex mb-2 items-center mx-16 gap-5">
             <div className="flex flex-col items-center">
               <h1>6</h1>
               <h1>Posts</h1>
@@ -169,7 +244,7 @@ const Profile = () => {
               <h1>Following</h1>
             </div>
           </div>
-          <div className="flex gap-5 mx-16">
+          <div className="flex justify-between gap-2 mx-10">
             <button
               onClick={toggleVisibility}
               type="button"
@@ -197,14 +272,14 @@ const Profile = () => {
         </div>
       </div>
       {isVisible && (
-        <div className="w-[50vw] my-5 mx-auto  flex flex-col gap-4 rounded-lg">
+        <div className="w-[90vw] my-5 mx-auto  flex flex-col gap-4 rounded-lg">
           <div className="flex items-center gap-3">
             <div className="w-[45%]  border-[1px] border-zinc-400"></div>
             <p className="text-zinc-700 text-lg uppercase">Edit</p>
             <div className="w-[45%]  border-[0.5px] border-zinc-400"></div>
           </div>
 
-          <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+          <form onSubmit={handleUpdate} className="flex flex-col gap-3">
             <input
               type="email"
               id="email"
@@ -238,8 +313,10 @@ const Profile = () => {
               onChange={handleInputChange}
             />
 
-            <button className="bg-blue-500 text-white py-1 rounded-lg hover:opacity-90">
-              Register
+            <button className="bg-blue-900 font-bold text-white py-1 rounded-lg hover:opacity-90 disabled:opacity-50 uppercase"
+            disabled={loading}
+            >
+              {loading ? <Spinner /> : "Update"}
             </button>
 
             <input
@@ -252,6 +329,30 @@ const Profile = () => {
           </form>
         </div>
       )}
+
+      <div className="min-h-screen w-full border-t-2 border-t-zinc-700 grid grid-cols-2 md:grid-cols-3">
+        {userPosts ? (
+          userPosts.map((post) => (
+            <div key={post._id} className="w-full h-full bg-black relative">
+              <Link to={`/userpost/${post._id}`}>
+                <img
+                  src={post.images}
+                  alt=""
+                  className=" w-full h-full object-cover bg-gray-600"
+                />
+              </Link>
+              <button
+                onClick={() => handleDeletePost({ post })}
+                className="absolute top-2 right-2 text-2xl p-2 bg-black/80 rounded-lg hover:opacity-50 text-white cursor-grab"
+              >
+                <MdOutlineDeleteForever />
+              </button>
+            </div>
+          ))
+        ) : (
+          <div>No Posts Yet</div>
+        )}
+      </div>
     </div>
   );
 };

@@ -11,8 +11,12 @@ const AuthContextProvider = ({ children }) => {
     JSON.parse(localStorage.getItem("chat-user")) || null
   );
 
+  const updateUser = (updatedUserData) => {
+    setauthUser({ ...authUser, ...updatedUserData });
+  };
+
   return (
-    <AuthContext.Provider value={{ authUser, setauthUser }}>
+    <AuthContext.Provider value={{ authUser, setauthUser, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

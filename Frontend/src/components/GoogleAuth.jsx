@@ -20,14 +20,12 @@ const GoogleAuth = () => {
       const provider = new GoogleAuthProvider();
       const auth = getAuth(app);
       const result = await signInWithPopup(auth, provider);
-      console.log(result);
 
       const formData = {
         fullname: result.user.displayName,
         email: result.user.email,
         profilePic: result.user.photoURL,
       };
-      console.log(formData);
 
       const res = await fetch("api/auth/google", {
         method: "POST",
@@ -35,7 +33,6 @@ const GoogleAuth = () => {
         body: JSON.stringify(formData),
       });
       const data = await res.json();
-      console.log(data);
       if (data.success === false) {
         seterrorGot(data.message);
         setloading(false);
@@ -60,7 +57,7 @@ const GoogleAuth = () => {
   return (
     <button
       onClick={handleGoogleSubmit}
-      className="bg-green-600 text-white uppercase p-2 rounded-lg hover:opacity-90"
+      className=" text-sm font-bold md:text-base bg-green-600 text-white uppercase p-2 rounded-lg hover:opacity-90"
     >
       Continue with google
     </button>

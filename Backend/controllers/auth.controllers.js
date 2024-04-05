@@ -40,7 +40,7 @@ export const loginUser = async (req, res, next) => {
         const validPassword = bcryptjs.compareSync(password, validUser.password)
         if (!validPassword) return next(errorHandler(401, "Wrong Credentials!"))
         const token = await jwt.sign({ id: validUser._id }, process.env.JWT_SECRET, { expiresIn: '15d' })
-        res.cookie("SocialMedia-Cookie", token, { maxAge: 15 * 24 * 60 * 60 * 1000, httpOnly: true }).status(200).json({
+        res.cookie("SocialMediaCookie", token, { maxAge: 15 * 24 * 60 * 60 * 1000, httpOnly: true }).status(200).json({
             success: true,
             statusCode: 200,
             user: validUser
@@ -52,7 +52,7 @@ export const loginUser = async (req, res, next) => {
 
 export const logoutUser = async (req, res, next) => {
     try {
-        res.clearCookie("SocialMedia-Cookie")
+        res.clearCookie("SocialMediaCookie")
         res.cookie("loggedOut", "", { maxAge: 0 })
         res.status(200).json("Loggedout Successfully")
     } catch (error) {
@@ -70,7 +70,7 @@ export const googleAuth = async (req, res, next) => {
         if (user) {
             console.log("found");
             const token = await jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '15d' })
-            res.cookie("SocialMedia-Cookie", token, { maxAge: 15 * 24 * 60 * 60 * 1000, httpOnly: true }).status(200).json({
+            res.cookie("SocialMediaCookie", token, { maxAge: 15 * 24 * 60 * 60 * 1000, httpOnly: true }).status(200).json({
                 success: true,
                 statusCode: 200,
                 user: user
@@ -99,7 +99,7 @@ export const googleAuth = async (req, res, next) => {
             await newUser.save()
 
             const token = await jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, { expiresIn: '15d' })
-            res.cookie("SocialMedia-Cookie", token, { maxAge: 15 * 24 * 60 * 60 * 1000, httpOnly: true }).status(200).json({
+            res.cookie("SocialMediaCookie", token, { maxAge: 15 * 24 * 60 * 60 * 1000, httpOnly: true }).status(200).json({
                 success: true,
                 statusCode: 200,
                 user: newUser

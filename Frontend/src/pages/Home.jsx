@@ -1,9 +1,42 @@
-import React from 'react'
+import React, { useState, useEffect } from "react";
+import AllPost from "../components/AllPost";
 
 const Home = () => {
-  return (
-    <div className='w-[80vw] ml-[20vw]'>Home</div>
-  )
-}
+  const [posts, setposts] = useState([]);
+  const [loading, setloading] = useState(false);
+  const [errorgot, seterrorgot] = useState(null);
 
-export default Home
+  useEffect(() => {
+    getPosts();
+  }, []);
+
+  const getPosts = async () => {
+    setloading(true);
+    try {
+      const res = await fetch("/api/post/posts");
+      const data = await res.json();
+      if (data.success === false) {
+        setloading(false);
+        console.log(data.message);
+        return;
+      }
+      setloading(false);
+      setposts(data.posts);
+    } catch (error) {
+      setloading(false);
+      console.log(error);
+    }
+  };
+
+  return (
+    <div className=" px-0 md:w-[80vw] md:ml-[18vw] md:pt-6">
+      <h1 className="uppercase text-center font-bold text-xl my-5">All posts of all users</h1>
+      {loading && <p className="  md:pt-10 text-center text-2xl">Loading....</p>}
+      {posts.map((post) => (
+        <AllPost key={post._id} post={post} />
+      ))}
+    </div>
+  );
+};
+
+export default Home;

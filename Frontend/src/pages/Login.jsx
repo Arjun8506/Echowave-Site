@@ -58,9 +58,9 @@ const Login = () => {
   };
 
   return (
-    <div className="w-full min-h-screen px-10 py-4">
+    <div className="w-full min-h-screen md:px-10 py-4 px-4">
       <div className="w-full md:w-[80%] lg:w-[40%] my-auto  md:mx-auto md:my-auto border-[1px] border-zinc-400  flex flex-col gap-4 p-4 lg:p-8 rounded-lg">
-      <div className="flex gap-2 items-center">
+      <div className="flex gap-2 items-center mx-auto">
       <img src="../../logo.png" alt="Logo" className="w-14 h-14 rounded-full" />
         <h1
           className="font-bold text-3xl lg:text-6xl text-center text-slate-800"
@@ -97,7 +97,7 @@ const Login = () => {
             onChange={handleInputChange}
           />
           <button
-            className="bg-blue-500 text-white py-1 rounded-lg hover:opacity-90 disabled:opacity-50"
+            className="bg-blue-500 text-white font-bold py-1 rounded-lg hover:opacity-90 disabled:opacity-50"
             disabled={loading}
           >
             {loading ? "Loading..." : "Log In"}
