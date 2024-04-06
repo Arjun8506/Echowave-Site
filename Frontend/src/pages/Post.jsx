@@ -115,7 +115,7 @@ const Post = () => {
   };
 
   return (
-    <div className="px-2 md:w-[80vw] md:ml-[18vw] md:pt-6 py-5 md:px-8 mb-10">
+    <div className="px-2 md:w-[90vw] md:ml-[8vw] lg:w-[80vw] lg:ml-[18vw] md:pt-6 py-5 md:px-8 lg:px-10 mb-10">
       <div className="font-bold text-4xl mb-5 px-2" id="logofont">
         POST
       </div>
@@ -143,7 +143,7 @@ const Post = () => {
         <button
           onClick={handleImageSubmit}
           type="button"
-          className="w-full p-2 uppercase bg-gray-600 text-white rounded-lg my-4 disabled:opacity-50 hover:opacity-90 font-bold "
+          className="w-full p-2 uppercase bg-gray-900 text-white rounded-lg my-4 disabled:opacity-50 hover:opacity-90 font-bold "
           disabled={loading}
         >
           {loading ? <Spinner /> : "Upload To Preview"}

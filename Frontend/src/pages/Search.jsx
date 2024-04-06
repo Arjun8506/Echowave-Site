@@ -66,7 +66,7 @@ const Search = () => {
   };
 
   return (
-    <div className="md:w-[80vw] md:ml-[19vw] md:px-10 py-4 mb-12">
+    <div className="md:w-[90vw] md:ml-[10vw] lg:w-[80vw] lg:ml-[20vw] md:px-0 py-4 mb-12 md:mb-0 h-fit">
       <div className="w-full h-20 px-2">
         <form
           className="w-full md:py-4 flex items-center justify-center  relative"
@@ -91,7 +91,7 @@ const Search = () => {
       </div>
 
       {serachResults && serachResults.length > 0 ? (
-        <div className="bg-zinc-300">
+        <div className="bg-zinc-300 md:px-0">
               <h1 className="text-xl my-2 px-2 capitalize font-bold flex items-center justify-start">
                 Search Results
               </h1>

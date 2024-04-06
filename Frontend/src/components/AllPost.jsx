@@ -30,21 +30,19 @@ const AllPost = ({ post }) => {
   const time = convertToIndianTime(post.createdAt);
 
   return (
-    <div className=" md:pl-6 overflow-x-hidden mb-14">
-      <div className="flex items-center justify-between px-3 mb-2">
-        <div className="flex items-center gap-2">
+    <div className=" overflow-x-hidden mb-14">
+      <div className="flex items-center justify-between md:px-6 lg:px-8 mb-2">
+        <div className="flex items-center gap-2  overflow-hidden ">
           <img
             src={post.author.profilePic}
             alt="profilePic"
             className="w-10 h-10 border-2 border-gray-600 object-cover rounded-full aspect-square"
           />
-          <Link to={"/"}>
             <h1 className="text-sm md:text-lg font-bold hover:text-blue-600 hover:opacity-90 hover:underline">
               {post.author.username}
             </h1>
-          </Link>
         </div>
-        <h1 className="text-[10px] font-semibold ">{time}</h1>
+        <h1 className="text-[10px] md:text-[12px] lg:text-xs font-semibold ">{time}</h1>
       </div>
 
       <div className="images ">
@@ -52,12 +50,12 @@ const AllPost = ({ post }) => {
           {post.images.map((image, index) => (
             //   <img key={index} src={image} alt={`Image ${index + 1}`} />
             <SwiperSlide key={index}>
-              <div className="w-full h-72 mb-2 flex flex-col items-center select-none  ">
+              <div className="w-full h-72 md:h-80 mb-2 flex flex-col items-center select-none overflow-x-hidden">
                 <img
                   src={image}
                   alt={`Image ${index + 1}`}
                   onClick={cangeSize}
-                  className="w-full h-[95%] "
+                  className="w-full h-[90%] "
                   style={{ objectFit: size }}
                 />
                 <p>
@@ -68,7 +66,7 @@ const AllPost = ({ post }) => {
           ))}
         </Swiper>
       </div>
-      <div className=" px-2 md:pl-6 text-2xl flex justify-between md:gap-5">
+      <div className=" px-2 md:px-8 lg:px-10 text-2xl flex justify-between md:gap-5">
         <h1 className="flex flex-col items-center">
           <BiSolidLike
             onClick={() => {
@@ -84,14 +82,14 @@ const AllPost = ({ post }) => {
         </h1>
         <FaRegCommentDots />
       </div>
-      <div className=" px-2 md:pl-6 my-2 md:mt-4">
+      <div className=" px-2 md:px-8 lg:px-10 my-2 md:mt-4">
         <h3 className="text-sm">
           {post.author.username}{"   "}
           <span className="text-xs md:text-sm font-bold">{post.caption}</span>
         </h3>
         <h4 className=" text-xs md:text-sm my-2">{post.description}</h4>
       </div>
-      <div className=" px-2 md:pl-6 mt-4 flex gap-2 items-start">
+      <div className=" px-2 md:px-8 lg:px-10 mt-4 flex gap-2 items-start">
       <img
             src={post.author.profilePic}
             alt="profilePic"
@@ -102,8 +100,6 @@ const AllPost = ({ post }) => {
             <button type="button" className="absolute top-2 right-2 bg-zinc-800 p-2 text-sm rounded-lg text-white hover:opacity-90"><IoSendSharp /></button>
           </form>
       </div>
-
-
     </div>
   );
 };

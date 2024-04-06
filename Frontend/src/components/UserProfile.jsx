@@ -91,13 +91,13 @@ const UserProfile = () => {
   };
 
   return (
-    <div className=" md:w-[80vw] md:ml-[18vw]  overflow-hidden md:pl-6 py-5 mb-10">
-      {loading ? <p className="text-2xl text-center ">Loading....</p> : ""}
+    <div className=" md:w-[90vw] md:ml-[8vw] lg:w-[80vw] lg:ml-[18vw] overflow-hidden  py-5 mb-10">
+      {loading ? <p className="text-2xl text-center  md:px-6 lg:px-10">Loading....</p> : ""}
 
-      <div className=" font-bold text-2xl mb-5 uppercase text-center md:text-start">
+      <div className=" font-bold text-2xl mb-5 uppercase text-center md:text-start md:px-6 lg:px-10">
         {user.fullname}
       </div>
-      <div className="flex flex-col items-center lg:flex-row lg:items-start mb-5">
+      <div className="flex flex-col items-center md:flex-row md:gap-x-16 md:px-6 lg:px-10 lg:items-start mb-5">
         <img
           className="w-32 h-32 object-cover border-[1px] border-zinc-400 rounded-full"
           src={user.profilePic}
@@ -161,7 +161,7 @@ const UserProfile = () => {
             </div>
           ))
         ) : (
-          <div>No Posts Yet</div>
+          <div className="text-center mt-2">No Posts Yet</div>
         )}
       </div>
     </div>

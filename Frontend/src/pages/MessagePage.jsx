@@ -97,30 +97,30 @@ const MessagePage = () => {
   };
 
   return (
-    <div className="md:w-[80vw] md:ml-[20vw] h-screen">
+    <div className="md:w-[90vw] md:ml-[10vw] lg:w-[80vw] lg:ml-[20vw] h-screen md:overflow-x-hidden">
       <div className="w-full h-screen bg-black/50">
-        <div className=" fixed z-50 w-full py-2 px-2 flex justify-between items-center bg-zinc-200 rounded-b-lg">
+        <div className=" fixed z-50 w-full md:w-[90vw] lg:w-[80vw] py-2 px-2 flex justify-between items-center bg-zinc-200 rounded-b-lg">
           <div className=" flex items-center gap-2 ">
             <img
               className="w-8 h-8 rounded-full border-2 border-zinc-600 object-cover aspect-square"
               src={user.profilePic}
               alt=""
             />
-            <h1 className="text-xs font-bold">{user.username}</h1>
+            <h1 className="text-xs font-bold md:text-base">{user.username}</h1>
           </div>
           <div>
-            <p className="text-[11px]">Last seen: 8:20AM, Today </p>
+            <p className="text-[11px] md:text-xs">Last seen: 8:20AM, Today </p>
           </div>
         </div>
-        <div className="w-full h-screen">
+        <div className="w-full md:w-[90vw] lg:w-[80vw] h-screen">
           <img
             src={bgImage}
             alt="bgImage"
             className="fixed top-0 left-0 -z-50 brightness-75"
           />
         </div>
-        <div className="absolute top-0 w-full h-screen">
-          <div className="fixed top-12 w-full h-72 overflow-y-auto">
+        <div className="absolute top-0 w-full md:w-[90vw] lg:w-[80vw] h-screen">
+          <div className="fixed top-12 w-full h-[70%] sm:h-[70%] overflow-y-auto">
             {messages.length > 0 ? (
               messages.map((message, index) => (
                 <div  key={index} className="flex flex-col gap-2">
@@ -128,19 +128,19 @@ const MessagePage = () => {
                 </div>
               ))
             ) : (
-              <h1 className="text-center text-sm text-white mt-4">
+              <h1 className="text-center text-sm text-white mt-4 mx-auto">
                 Start Chat Now
               </h1>
             )}
           </div>
-          <div className="w-full fixed flex items-center gap-2 bottom-16 z-40 px-2">
+          <div className="w-full md:w-[90vw] lg:w-[80vw] fixed flex items-center gap-2 bottom-16 md:bottom-6 z-40 px-2">
             <div
               onClick={() => fileref.current.click()}
               className=" p-1 border-4 border-zinc-600 bg-zinc-600 text-white w-fit h-fit rounded-lg hover:opacity-80"
             >
               <FaPlus />
             </div>
-            <form className="flex items-center w-full" onSubmit={sendMessage}>
+            <form className="flex items-center w-full " onSubmit={sendMessage}>
               <input
                 type="file"
                 ref={fileref}
@@ -151,7 +151,7 @@ const MessagePage = () => {
               <input
                 type="text"
                 id="message"
-                className=" text-white w-full bg-transparent border-4 border-zinc-300 rounded-lg p-1 focus:outline-none text-sm"
+                className=" text-white w-full bg-transparent border-4 border-zinc-300 rounded-lg p-1 focus:outline-none text-sm md:p-2"
                 value={formData.message}
                 onChange={(e) =>
                   setformData({ ...formData, message: e.target.value })

@@ -187,14 +187,14 @@ const Profile = () => {
   };
 
   return (
-    <div className="w-full overflow-hidden  lg:pl-[20vw] py-5">
+    <div className="w-full overflow-hidden md:w-[90vw] md:ml-[8vw] lg:w-[80vw] lg:ml-[18vw] py-5">
       <div
-        className=" font-bold text-4xl mb-5 uppercase text-center md:text-start"
+        className=" font-bold text-4xl mb-5 uppercase text-center md:text-start md:px-6 lg:px-10"
         id="logofont"
       >
         Profile
       </div>
-      <div className="flex flex-col items-center lg:flex-row lg:items-start">
+      <div className="flex flex-col sm:flex-row  sm:justify-center md:justify-start items-center lg:flex-row lg:items-start md:px-6 lg:px-10">
         {isVisible ? (
           <div className="relative">
             <img
@@ -230,7 +230,7 @@ const Profile = () => {
           <div className="text-center my-2 text-2xl" id="logofont">
             <h1>{authUser.username}</h1>
           </div>
-          <div className="flex mb-2 items-center mx-16 gap-5">
+          <div className="flex mb-2 items-center mx-16 gap-5 md:gap-7">
             <div className="flex flex-col items-center">
               <h1>6</h1>
               <h1>Posts</h1>
@@ -272,14 +272,14 @@ const Profile = () => {
         </div>
       </div>
       {isVisible && (
-        <div className="w-[90vw] my-5 mx-auto  flex flex-col gap-4 rounded-lg">
+        <div className="w-[90vw] lg:w-[80vw] my-5 mx-auto  flex flex-col gap-4 rounded-lg">
           <div className="flex items-center gap-3">
             <div className="w-[45%]  border-[1px] border-zinc-400"></div>
             <p className="text-zinc-700 text-lg uppercase">Edit</p>
             <div className="w-[45%]  border-[0.5px] border-zinc-400"></div>
           </div>
 
-          <form onSubmit={handleUpdate} className="flex flex-col gap-3">
+          <form onSubmit={handleUpdate} className="flex flex-col gap-3 md:px-10">
             <input
               type="email"
               id="email"
@@ -330,7 +330,7 @@ const Profile = () => {
         </div>
       )}
 
-      <div className="min-h-screen w-full border-t-2 border-t-zinc-700 grid grid-cols-2 md:grid-cols-3">
+      <div className="min-h-screen w-full border-t-2 border-t-zinc-700 grid grid-cols-2 md:grid-cols-3 md:pl-[10vw]">
         {userPosts ? (
           userPosts.map((post) => (
             <div key={post._id} className="w-full h-full bg-black relative">

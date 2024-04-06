@@ -33,7 +33,7 @@ const SeePost = () => {
   }
 
   return (
-    <div className='w-[80vw] ml-[18vw] pt-6'>
+    <div className='md:w-[90vw] md:ml-[8vw] lg:w-[80vw] lg:ml-[18vw] pt-6'>
       {post !== null ? (
         <AllPost post={post} />
       ) : "Loading...."}
