@@ -2,12 +2,13 @@ import React from "react";
 import { useAuthContext } from "../context/authContext";
 
 const Message = ({ message }) => {
-  
-    const { authUser } = useAuthContext()
-    
-    const date = new Date(message.createdAt);
-  let hours = date.getUTCHours();
-  const minutes = date.getUTCMinutes();
+  const { authUser } = useAuthContext();
+
+  const date = new Date(message.createdAt);
+  date.setUTCHours(date.getUTCHours());
+  date.setUTCMinutes(date.getUTCMinutes());
+  let hours = date.getHours();
+  const minutes = date.getMinutes();
   const currentDate = new Date();
   let period = "AM";
 
@@ -42,10 +43,15 @@ const Message = ({ message }) => {
   }
 
   return (
-    <div className={` mx-2 top-2 bg-green-300 px-2 py-1 w-fit rounded-b-lg rounded-l-lg my-2 
-    ${authUser._id === message.senderid ? "bg-green-400" : "bg-blue-400"}
-    ${authUser._id === message.senderid ? "right-2" : "left-2"}
-    `}>
+    <div
+      className={`mx-2 top-2  px-2 py-1 text-white w-fit rounded-b-lg my-2 
+    ${
+      authUser._id === message.senderid
+        ? "bg-green-600 ml-[50%] rounded-l-lg"
+        : "bg-blue-400 rounded-r-lg"
+    }
+    `}
+    >
       <h1 className="text-xs font-semibold">{message.message}</h1>
       <p className="text-[12px] text-end">
         {day}, {time}

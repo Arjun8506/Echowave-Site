@@ -48,6 +48,31 @@ const MessagePage = () => {
     }
   };
 
+  useEffect(() => {
+    getMessages();
+  }, [user]);
+
+  const getMessages = async () => {
+    try {
+      const res = await fetch(`/api/message/getmessages/${user._id}`);
+      const data = await res.json();
+      if (data.success === false) {
+        toast.error(data.message);
+        return;
+      }
+      if (data.message === 0) {
+        return;
+      } else {
+        const allMessages = [...messages, ...data.message]
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+          .reverse();
+        setmessages(allMessages);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
   const sendMessage = async (e) => {
     e.preventDefault();
 
@@ -74,25 +99,16 @@ const MessagePage = () => {
     }
   };
 
-  useEffect(() => {
-    getMessages();
-  }, [user]);
+  const messageContainerRef = useRef(null);
 
-  const getMessages = async () => {
-    try {
-      const res = await fetch(`/api/message/getmessages/${user._id}`);
-      const data = await res.json();
-      if (data.success === false) {
-        toast.error(data.message);
-        return;
-      }
-      if (data.message === 0) {
-        return;
-      } else {
-        setmessages(data.message);
-      }
-    } catch (error) {
-      toast.error(error.message);
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]); // Scroll to bottom whenever messages change
+
+  const scrollToBottom = () => {
+    if (messageContainerRef.current) {
+      messageContainerRef.current.scrollTop =
+        messageContainerRef.current.scrollHeight;
     }
   };
 
@@ -112,18 +128,21 @@ const MessagePage = () => {
             <p className="text-[11px] md:text-xs">Last seen: 8:20AM, Today </p>
           </div>
         </div>
-        <div className="w-full md:w-[90vw] lg:w-[80vw] h-screen">
+        <div className="w-full md:w-[90vw] lg:w-[80vw] min-h-screen">
           <img
             src={bgImage}
             alt="bgImage"
-            className="fixed top-0 left-0 -z-50 brightness-75"
+            className="fixed top-0 left-0 -z-50 brightness-75 min-h-screen w-full"
           />
         </div>
         <div className="absolute top-0 w-full md:w-[90vw] lg:w-[80vw] h-screen">
-          <div className="fixed top-12 w-full h-[70%] sm:h-[70%] overflow-y-auto">
+          <div
+            ref={messageContainerRef}
+            className="fixed top-12 w-full h-[65%] sm:h-[70%] overflow-y-auto"
+          >
             {messages.length > 0 ? (
               messages.map((message, index) => (
-                <div  key={index} className="flex flex-col gap-2">
+                <div key={index} className="flex flex-col gap-2">
                   <Message message={message} />
                 </div>
               ))

@@ -26,8 +26,16 @@ export const getSpacificMessages = async (req, res, next) => {
     try {
         const senderid = req.user.id
         const receiverid = req.params.id
-        const filteredMessages = await Message.find({ senderid: senderid, receiverid: receiverid })
-        if (filteredMessages.length === 0) {
+        // Fetch messages where senderid matches provided senderid and receiverid matches provided receiverid
+        const messagesSent = await Message.find({ senderid, receiverid }).sort({ createdAt: 1 });
+
+        // Fetch messages where senderid matches provided receiverid and receiverid matches provided senderid
+        const messagesReceived = await Message.find({ senderid: receiverid, receiverid: senderid }).sort({ createdAt: 1 });
+
+        // Concatenate the two arrays of messages
+        const allMessages = messagesSent.concat(messagesReceived).reverse();
+
+        if (allMessages.length === 0) {
             res.status(404).json({
                 success: true,
                 statusCode: 404,
@@ -37,7 +45,7 @@ export const getSpacificMessages = async (req, res, next) => {
             res.status(200).json({
                 success: true,
                 statusCode: 200,
-                message: filteredMessages
+                message: allMessages
             })
         }
     } catch (error) {

@@ -5,10 +5,20 @@ import "swiper/swiper-bundle.css";
 import { BiSolidLike } from "react-icons/bi";
 import { FaRegCommentDots } from "react-icons/fa";
 import { IoSendSharp } from "react-icons/io5";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import Spinner from "./Spinner";
 
 const AllPost = ({ post }) => {
   const [size, setsize] = useState("cover");
   const [likecolor, setlikecolor] = useState("black");
+  const [loading, setloading] = useState(false);
+  const [formData, setformData] = useState({
+    postid: post._id,
+    comment: ""
+  })
+  const [comments, setcomments] = useState([])
+  console.log(comments);
 
   const cangeSize = () => {
     if (size === "cover") {
@@ -28,6 +38,45 @@ const AllPost = ({ post }) => {
   }
 
   const time = convertToIndianTime(post.createdAt);
+
+  const sendComment = async (e) => {
+    e.preventDefault();
+
+    try {
+      setloading(true);
+      const res = await fetch("/api/comment/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+      const data = await res.json();
+      if (data.success === false) {
+        setloading(false);
+        toast.error(data.message);
+        return;
+      }
+      setloading(false);
+      console.log(data);
+      toast.success(data.message);
+    } catch (error) {
+      setloading(false);
+      toast.error(error.message);
+    }
+  }
+
+  const getComments = async () => {
+    try {
+      const res = await fetch(`/api/comment/allcomments/${post._id}`);
+      const data = await res.json();
+      if (data.success === false) {
+        toast.error(data.message);
+        return;
+      }
+      setcomments(data.comments)
+    } catch (error) {
+      toast.error(error.message);
+    }
+  }
 
   return (
     <div className=" overflow-x-hidden mb-14">
@@ -80,7 +129,7 @@ const AllPost = ({ post }) => {
           />
           <span className="text-[14px]">(Likes)</span>
         </h1>
-        <FaRegCommentDots />
+        <FaRegCommentDots onClick={getComments} />
       </div>
       <div className=" px-2 md:px-8 lg:px-10 my-2 md:mt-4">
         <h3 className="text-sm">
@@ -95,10 +144,24 @@ const AllPost = ({ post }) => {
             alt="profilePic"
             className="w-10 h-10 border-2 border-gray-600 object-cover rounded-full aspect-square"
           />
-          <form className="w-full relative">
-        <textarea  id="comment" className=" text-xs md:text-sm w-full h-20 p-2  border-2 rounded-lg " placeholder="Comment here...." />
-            <button type="button" className="absolute top-2 right-2 bg-zinc-800 p-2 text-sm rounded-lg text-white hover:opacity-90"><IoSendSharp /></button>
+          <form className="w-full relative" onSubmit={sendComment}>
+        <textarea  id="comment" className=" text-xs md:text-sm w-full h-20 p-2  border-2 rounded-lg " placeholder="Comment here...."
+        value={formData.comment}
+        onChange={(e) => setformData({...formData, comment: e.target.value})}
+        />
+            <button type="submit" className="absolute top-2 right-2 bg-zinc-800 p-2 text-sm rounded-lg text-white hover:opacity-90 disabled:opacity-50"
+            disabled={loading}
+            >
+              {loading ? <Spinner /> : <IoSendSharp />}
+            </button>
           </form>
+      </div>
+      <div className="w-full min-h-fit px-2 md:px-8 lg:px-10">
+        {comments.length > 0 ? (
+          comments.map((comment) => {
+
+          })
+        ) : <p className="text-center text-lg text-red-500 font-bold">No Comments</p>}
       </div>
     </div>
   );
