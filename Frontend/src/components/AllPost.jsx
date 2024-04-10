@@ -8,8 +8,11 @@ import { IoSendSharp } from "react-icons/io5";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Spinner from "./Spinner";
+import Comment from "./Comment";
+import { useAuthContext } from "../context/authContext";
 
 const AllPost = ({ post }) => {
+  const { authUser } = useAuthContext()
   const [size, setsize] = useState("cover");
   const [likecolor, setlikecolor] = useState("black");
   const [loading, setloading] = useState(false);
@@ -18,7 +21,6 @@ const AllPost = ({ post }) => {
     comment: ""
   })
   const [comments, setcomments] = useState([])
-  console.log(comments);
 
   const cangeSize = () => {
     if (size === "cover") {
@@ -56,7 +58,7 @@ const AllPost = ({ post }) => {
         return;
       }
       setloading(false);
-      console.log(data);
+      setformData({ comment: "" })
       toast.success(data.message);
     } catch (error) {
       setloading(false);
@@ -78,6 +80,35 @@ const AllPost = ({ post }) => {
     }
   }
 
+  
+  const likeThePost = async ()=> {
+    try {
+      const res = await fetch(`/api/post/likepost/${post._id}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" }
+      });
+      const data = await res.json();
+      if (data.success === false) {
+        toast.error(data.message);
+        return;
+      }
+      toast.success(data.message);
+      setLiked(!liked);
+    } catch (error) {
+      toast.error(error.message);
+    }
+  }
+
+  const [liked, setLiked] = useState(false);
+
+  useEffect(() => {
+    if (post.likes.includes(authUser._id)) {
+      setLiked(true);
+    } else {
+      setLiked(false);
+    }
+  }, [post.likes, authUser, likeThePost]);
+  
   return (
     <div className=" overflow-x-hidden mb-14">
       <div className="flex items-center justify-between md:px-6 lg:px-8 mb-2">
@@ -118,18 +149,16 @@ const AllPost = ({ post }) => {
       <div className=" px-2 md:px-8 lg:px-10 text-2xl flex justify-between md:gap-5">
         <h1 className="flex flex-col items-center">
           <BiSolidLike
-            onClick={() => {
-              if (likecolor === "black") {
-                setlikecolor("blue");
-              } else {
-                setlikecolor("black");
-              }
-            }}
-            className="cursor-pointer select-none" style={{color : likecolor}}
+            onClick={() => likeThePost()}
+            className= {`cursor-pointer select-none 
+            ${liked ? "text-blue-600" : ""}
+            `}
           />
-          <span className="text-[14px]">(Likes)</span>
+          <span className="text-[14px]">(Likes {post.likes.length} )</span>
         </h1>
-        <FaRegCommentDots onClick={getComments} />
+        <button type="button" onClick={() =>getComments()}>
+        <FaRegCommentDots />
+        </button>
       </div>
       <div className=" px-2 md:px-8 lg:px-10 my-2 md:mt-4">
         <h3 className="text-sm">
@@ -140,7 +169,7 @@ const AllPost = ({ post }) => {
       </div>
       <div className=" px-2 md:px-8 lg:px-10 mt-4 flex gap-2 items-start">
       <img
-            src={post.author.profilePic}
+            src={authUser.profilePic}
             alt="profilePic"
             className="w-10 h-10 border-2 border-gray-600 object-cover rounded-full aspect-square"
           />
@@ -158,9 +187,11 @@ const AllPost = ({ post }) => {
       </div>
       <div className="w-full min-h-fit px-2 md:px-8 lg:px-10">
         {comments.length > 0 ? (
-          comments.map((comment) => {
-
-          })
+          comments.map((comment) => (
+            <div key={comment._id} className="w-full min-h-fit my-4 ">
+              <Comment comment= {comment} />
+            </div>
+          ))
         ) : <p className="text-center text-lg text-red-500 font-bold">No Comments</p>}
       </div>
     </div>

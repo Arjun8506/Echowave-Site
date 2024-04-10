@@ -4,7 +4,7 @@ import { loggedInUser } from "../middleware/getLoggedInUser.js"
 
 const router = express.Router()
 
-router.get("/alluser", allUsers)
+router.get("/alluser", loggedInUser, allUsers)
 
 router.post("/updateuser", loggedInUser, updateUser)
 

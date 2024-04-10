@@ -4,7 +4,8 @@ import bcryptjs from "bcryptjs"
 
 export const allUsers = async (req, res, next) => {
     try {
-        const users = await User.find().sort({ createdAt: -1 })
+        const loggedInUserId = req.user.id
+        const users = await User.find({ _id: { $ne: loggedInUserId } }).sort({ createdAt: -1 })
         if (!users) return next(errorHandler(404, "Users Not Found"))
         res.status(200).json({
             success: true,

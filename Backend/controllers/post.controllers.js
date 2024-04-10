@@ -109,3 +109,23 @@ export const getUserPost = async (req, res, next) => {
         next(error)
     }
 }
+
+export const likeThePost = async (req, res, next) => {
+    try {
+        const postId = req.params.id
+        const likedUserId = req.user.id
+        const post = await Post.findById(postId)
+        if (!post) {
+            return next(errorHandler(401, "unable to get posts"))
+        }
+        if (post.likes.includes(likedUserId)) {
+            return next(errorHandler(400, "User has already liked the post"));
+        }
+        post.likes.push(likedUserId);
+        await post.save();
+        res.status(200).json({ success: true, message: "Post liked successfully" });
+
+    } catch (error) {
+        next(error)
+    }
+}

@@ -6,6 +6,8 @@ const Home = () => {
   const [loading, setloading] = useState(false);
   const [errorgot, seterrorgot] = useState(null);
 
+  console.log(posts);
+
   useEffect(() => {
     getPosts();
   }, []);
