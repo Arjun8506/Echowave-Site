@@ -57,13 +57,13 @@ const App = () => {
         <Route
           path="/register"
           element={
-            authUser ? <Navigate to={"/"} /> : <Navigate to={"/register"} />
+            authUser ? <Navigate to={"/"} /> : <Register />
           }
         />
         <Route
           path="/login"
           element={
-            authUser ? <Navigate to={"/"} /> : <Navigate to={"/login"} />
+            authUser ? <Navigate to={"/"} /> : <Login />
           }
         />
       </Routes>

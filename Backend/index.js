@@ -11,11 +11,14 @@ import postRoutes from './routes/post.routes.js'
 import userRoutes from './routes/user.routes.js'
 import messageRoutes from "./routes/message.routes.js"
 import commentRoutes from "./routes/comment.routes.js"
+import path from "path"
 
 dotenv.config()
 
 const app = express()
 const Port = process.env.PORT
+
+const __dirname = path.resolve()
 
 app.use(express.json())
 app.use(cors())
@@ -63,6 +66,13 @@ io.on('connection', (socket) => {
         io.emit("getOnlineUsers", Object.keys(userSocketMap));
     })
 })
+
+app.use(express.static(path.join(__dirname, "/Frontend/dist")))
+
+app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "Frontend", "dist", "index.html"));
+})
+
 
 server.listen(Port, () => {
     ConnectDB()
