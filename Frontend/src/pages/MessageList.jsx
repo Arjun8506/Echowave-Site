@@ -3,10 +3,12 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Link } from "react-router-dom";
 import { FaHandPointDown } from "react-icons/fa";
+import { useSocketContext } from "../context/SocketContext";
 
 const MessageList = () => {
   const [users, setusers] = useState([]);
   const [loading, setloading] = useState(false);
+  const { onlineUsers } = useSocketContext()
 
   useEffect(() => {
     allUsers();
@@ -41,12 +43,20 @@ const MessageList = () => {
       key={user._id}
       className=" overflow-hidden py-2 flex gap-0 items-center justify-between px-2"
     >
-      <div className="flex gap-2 items-center">
+      <div className="flex gap-2 items-center relative">
         <img
           src={user.profilePic}
           alt="profilePic"
           className="w-8 h-8 border-2 border-zinc-500 rounded-full object-cover"
         />
+
+          {onlineUsers.map((onlineuser) => (
+            onlineuser === user._id ? (
+              <div className="w-2 h-2 rounded-full bg-green-500 absolute top-0 -z-50" key={onlineuser}>
+              </div>
+            ) : ""
+          )) }
+
         <Link to={`/message/${user._id}`}>
           <h1 className="hover:text-blue-600 hover:opacity-90 font-bold">
             {user.username}

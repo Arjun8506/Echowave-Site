@@ -1,4 +1,5 @@
 import Message from "../models/message.model.js"
+import { io, getReceiverSocketId } from "../index.js"
 
 export const createMessage = async (req, res, next) => {
     try {
@@ -12,6 +13,13 @@ export const createMessage = async (req, res, next) => {
             message: message
         })
         await newMessage.save()
+
+        // SOCKET IO FUNCTIONALITY
+        const receiverSocketId = getReceiverSocketId(receiverid);
+        if (receiverSocketId) {
+            io.to(receiverSocketId).emit("newMessage", newMessage)
+        }
+
         res.status(201).json({
             success: true,
             statusCode: 201,

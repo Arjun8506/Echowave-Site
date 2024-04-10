@@ -5,8 +5,8 @@ const Message = ({ message }) => {
   const { authUser } = useAuthContext();
 
   const date = new Date(message.createdAt);
-  date.setUTCHours(date.getUTCHours());
-  date.setUTCMinutes(date.getUTCMinutes());
+  date.setHours(date.getUTCHours());
+  date.setMinutes(date.getUTCMinutes());
   let hours = date.getHours();
   const minutes = date.getMinutes();
   const currentDate = new Date();

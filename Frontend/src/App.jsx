@@ -54,8 +54,18 @@ const App = () => {
           path="/message/:id"
           element={authUser ? <MessagePage /> : <Navigate to={"/login"} />}
         />
-        <Route path="/register" element={<Register />} />
-        <Route path="/login" element={<Login />} />
+        <Route
+          path="/register"
+          element={
+            authUser ? <Navigate to={"/"} /> : <Navigate to={"/register"} />
+          }
+        />
+        <Route
+          path="/login"
+          element={
+            authUser ? <Navigate to={"/"} /> : <Navigate to={"/login"} />
+          }
+        />
       </Routes>
       <ToastContainer />
     </BrowserRouter>

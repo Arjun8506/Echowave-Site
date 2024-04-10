@@ -1,7 +1,9 @@
-import express, { json } from "express"
+import express from "express"
 import dotenv from 'dotenv'
 import cors from 'cors'
 import cookieParser from "cookie-parser"
+import http from "http"
+import { Server } from "socket.io"
 
 import ConnectDB from "./connectDB/connectDB.js"
 import authRoutes from './routes/auth.routes.js'
@@ -29,7 +31,40 @@ app.use("/api/message", messageRoutes)
 
 app.use("/api/comment", commentRoutes)
 
-app.listen(Port, ()=> {
+const server = http.createServer(app)
+
+export const getReceiverSocketId = (receiverId) => {
+    return userSocketMap[receiverId];
+}
+
+const userSocketMap = {};
+
+export const io = new Server(server, {
+    cors: {
+        origin: "http://localhost:5173", 
+        methods: ["GET", "POST"],
+        credentials: true 
+      }
+});
+
+io.on('connection', (socket) => {
+    console.log("a user connected", socket.id);
+
+    const userId = socket.handshake.query.userId;
+    if (userId != "undefined") {
+        userSocketMap[userId] = socket.id;
+    }
+
+    io.emit("getOnlineUsers", Object.keys(userSocketMap));
+
+    socket.on("disconnect", () => {
+        console.log("user disconnected", socket.id);
+        delete userSocketMap[userId];
+        io.emit("getOnlineUsers", Object.keys(userSocketMap));
+    })
+})
+
+server.listen(Port, () => {
     ConnectDB()
     console.log(`Server is Running on ${Port} Port`);
 })

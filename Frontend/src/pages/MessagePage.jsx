@@ -6,6 +6,7 @@ import { LuSend } from "react-icons/lu";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Message from "../components/Message";
+import { useSocketContext } from "../context/SocketContext";
 
 const MessagePage = () => {
   const { authUser } = useAuthContext();
@@ -63,10 +64,12 @@ const MessagePage = () => {
       if (data.message === 0) {
         return;
       } else {
-        const allMessages = [...messages, ...data.message]
-          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-          .reverse();
-        setmessages(allMessages);
+        setmessages(prevMessages => {
+          const allMessages = [...prevMessages, ...data.message]
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+            .reverse();
+          return allMessages;
+        });
       }
     } catch (error) {
       toast.error(error.message);
@@ -91,6 +94,12 @@ const MessagePage = () => {
         toast.error(data.message);
         return;
       }
+      setmessages(prevMessages => {
+        const allMessages = [...prevMessages, ...data.message]
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+          .reverse();
+        return allMessages;
+      });
       setloadingWhileSending(false);
       setformData({ message: "" });
     } catch (error) {
@@ -111,6 +120,21 @@ const MessagePage = () => {
         messageContainerRef.current.scrollHeight;
     }
   };
+
+  function useListenMessages() {
+    const {socket} = useSocketContext();
+  
+    useEffect(() => {
+      socket?.on("newMessage", (newMessage) => {
+        setmessages(prevMessages => [...prevMessages, newMessage]);
+      })
+  
+      return () => socket?.off("newMessage")
+    }, [socket, setmessages, messages])
+    
+  }
+
+  useListenMessages()
 
   return (
     <div className="md:w-[90vw] md:ml-[10vw] lg:w-[80vw] lg:ml-[20vw] h-screen md:overflow-x-hidden">
