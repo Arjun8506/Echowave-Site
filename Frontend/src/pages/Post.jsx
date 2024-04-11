@@ -115,7 +115,7 @@ const Post = () => {
   };
 
   return (
-    <div className="px-2 md:w-[90vw] md:ml-[8vw] lg:w-[80vw] lg:ml-[18vw] md:pt-6 py-5 md:px-8 lg:px-10 mb-10">
+    <div className="px-4 md:w-[90vw] md:ml-[8vw] lg:w-[80vw] lg:ml-[18vw] md:pt-6 py-5 md:px-8 lg:px-10 mb-10">
       <div className="font-bold text-4xl mb-5 px-2" id="logofont">
         POST
       </div>

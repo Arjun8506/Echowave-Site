@@ -32,7 +32,7 @@ const MessageList = () => {
     }
   };
 
-  return <div className="md:w-[90vw] md:ml-[10vw] lg:px-10 lg:w-[80vw] lg:ml-[18vw]">
+  return <div className="md:w-[90vw] md:ml-[10vw] lg:px-10 lg:w-[80vw] lg:ml-[18vw] px-2">
   <h1 className="py-6 capitalize font-semibold flex items-center gap-2 px-2">
     All Users are here below <FaHandPointDown />
   </h1>

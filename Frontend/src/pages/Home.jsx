@@ -29,7 +29,7 @@ const Home = () => {
   };
 
   return (
-    <div className=" px-0 md:w-[90vw] md:ml-[8vw] lg:w-[80vw] lg:ml-[18vw] md:pt-6 overflow-x-hidden">
+    <div className=" px-2 md:w-[90vw] md:ml-[8vw] lg:w-[80vw] lg:ml-[18vw] md:pt-6 overflow-x-hidden">
       <h1 className="uppercase text-center font-bold text-xl my-5">All posts of all users</h1>
       {loading && <p className="  md:pt-10 text-center text-2xl">Loading....</p>}
       {posts.map((post) => (

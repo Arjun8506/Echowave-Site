@@ -91,7 +91,7 @@ const UserProfile = () => {
   };
 
   return (
-    <div className=" md:w-[90vw] md:ml-[8vw] lg:w-[80vw] lg:ml-[18vw] overflow-hidden  py-5 mb-10">
+    <div className=" md:w-[90vw] md:ml-[8vw] lg:w-[80vw] lg:ml-[18vw] overflow-hidden  py-5 mb-10 px-2">
       {loading ? <p className="text-2xl text-center  md:px-6 lg:px-10">Loading....</p> : ""}
 
       <div className=" font-bold text-2xl mb-5 uppercase text-center md:text-start md:px-6 lg:px-10">

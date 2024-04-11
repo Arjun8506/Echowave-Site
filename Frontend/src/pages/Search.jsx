@@ -66,7 +66,7 @@ const Search = () => {
   };
 
   return (
-    <div className="md:w-[90vw] md:ml-[10vw] lg:w-[80vw] lg:ml-[20vw] md:px-0 py-4 mb-12 md:mb-0 h-fit">
+    <div className="md:w-[90vw] md:ml-[10vw] lg:w-[80vw] lg:ml-[20vw] md:px-0 py-4 mb-12 md:mb-0 h-fit px-2">
       <div className="w-full h-20 px-2">
         <form
           className="w-full md:py-4 flex items-center justify-center  relative"

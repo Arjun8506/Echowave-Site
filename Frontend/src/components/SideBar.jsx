@@ -28,7 +28,7 @@ const SideBar = () => {
     <>
       {menubar ? (
         <div>
-          <div className=" fixed bottom-0 bg-zinc-200  z-50 rounded-t-lg py-2 px-2 h-fit flex justify-between items-center w-full">
+          <div className="  fixed bottom-0 bg-zinc-200  z-50 rounded-t-lg py-2 px-4 h-fit flex justify-between items-center w-full">
             <Link
               to={"/"}
               className="flex gap-1 items-center justify-center lg:justify-start"

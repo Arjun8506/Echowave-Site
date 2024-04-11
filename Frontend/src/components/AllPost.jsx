@@ -111,7 +111,7 @@ const AllPost = ({ post }) => {
   
   return (
     <div className=" overflow-x-hidden mb-14">
-      <div className="flex items-center justify-between md:px-6 lg:px-8 mb-2">
+      <div className="flex items-center justify-between md:px-6 lg:px-8 mb-2 px-2">
         <div className="flex items-center gap-2  overflow-hidden ">
           <img
             src={post.author.profilePic}

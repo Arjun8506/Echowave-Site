@@ -137,7 +137,7 @@ const MessagePage = () => {
   useListenMessages()
 
   return (
-    <div className="md:w-[90vw] md:ml-[10vw] lg:w-[80vw] lg:ml-[20vw] h-screen md:overflow-x-hidden">
+    <div className="md:w-[90vw] md:ml-[10vw] lg:w-[80vw] lg:ml-[20vw] h-screen md:overflow-x-hidden px-2">
       <div className="w-full h-screen bg-black/50">
         <div className=" fixed z-50 w-full md:w-[90vw] lg:w-[80vw] py-2 px-2 flex justify-between items-center bg-zinc-200 rounded-b-lg">
           <div className=" flex items-center gap-2 ">

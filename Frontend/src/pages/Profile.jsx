@@ -187,7 +187,7 @@ const Profile = () => {
   };
 
   return (
-    <div className="w-full overflow-hidden md:w-[90vw] md:ml-[8vw] lg:w-[80vw] lg:ml-[18vw] py-5">
+    <div className="w-full overflow-hidden md:w-[90vw] md:ml-[8vw] lg:w-[80vw] lg:ml-[18vw] py-5 px-2">
       <div
         className=" font-bold text-4xl mb-5 uppercase text-center md:text-start md:px-6 lg:px-10"
         id="logofont"

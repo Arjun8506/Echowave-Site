@@ -44,7 +44,7 @@ const Message = ({ message }) => {
 
   return (
     <div
-      className={`mx-2 top-2  px-2 py-1 text-white w-fit rounded-b-lg my-2 
+      className={`mx-2 top-2  px-4 py-1 text-white w-fit rounded-b-lg my-2 
     ${
       authUser._id === message.senderid
         ? "bg-green-600 ml-[50%] rounded-l-lg"
