@@ -43,6 +43,9 @@ const AllPost = ({ post }) => {
 
   const sendComment = async (e) => {
     e.preventDefault();
+    if (formData.comment === "") {
+      return toast.error("Empty field is not allowd")
+    }
 
     try {
       setloading(true);

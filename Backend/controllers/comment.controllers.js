@@ -7,7 +7,7 @@ export const commentHere = async (req, res, next) => {
         const userid = req.user.id
 
         const existedComment = await Comment.find({ userid: userid })
-        if (existedComment) return next(errorHandler(409, "You already commented"))
+        if (existedComment.length > 0) return next(errorHandler(409, "You already commented"))
 
         const newComment = new Comment({
             postid: postid,
