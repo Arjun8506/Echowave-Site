@@ -58,7 +58,12 @@ const UserProfile = () => {
     try {
       const res = await fetch(`/api/post/spacifivuserpost/${user._id}`);
       const data = await res.json();
-      setposts(data.posts)
+      if (data.success === false) {
+        toast.error(data.message)
+        return
+      }else{
+        setposts(data.posts)
+      }
     } catch (error) {
       toast.error(error.message);
     }
@@ -90,6 +95,51 @@ const UserProfile = () => {
     }
   };
 
+  const follow = async () => {
+    try {
+      const res = await fetch(`/api/followroute/follow/${user._id}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" }
+      });
+      const data = await res.json();
+      if (data.success === false) {
+        toast.error(data.message);
+        return;
+      }
+      console.log(data);
+      toast.success(data.message)
+      toast.success(`You started Fllowing ${user.username}`)
+    } catch (error) {
+      toast.error(error.message);
+    }
+  }
+
+  const [followingno, setfollowingno] = useState(0)
+
+  const following = async () => {
+    try {
+      const res = await fetch(`/api/followroute/following/${user._id}`);
+      const data = await res.json();
+      if (data.success === false) {
+        toast.error(data.message);
+        return;
+      }
+      if (data.followingCount === 0) {
+        toast.error("No One is Following you")
+        return
+      }else{
+        setfollowingno(data.followingCount)
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  }
+
+  useEffect(() => {
+    following()
+  }, [])
+  
+
   return (
     <div className=" md:w-[90vw] md:ml-[8vw] lg:w-[80vw] lg:ml-[18vw] overflow-hidden  py-5 mb-10 px-2">
       {loading ? <p className="text-2xl text-center  md:px-6 lg:px-10">Loading....</p> : ""}
@@ -109,7 +159,7 @@ const UserProfile = () => {
           </div>
           <div className="flex mx-auto gap-4 py-2 justify-between">
             <div className="flex flex-col items-center">
-              <h1>6</h1>
+              <h1>{posts?.length === 0 ? "0" : (posts?.length)}</h1>
               <h1>Posts</h1>
             </div>
             <div className="flex flex-col items-center">
@@ -117,7 +167,7 @@ const UserProfile = () => {
               <h1>Follwers</h1>
             </div>
             <div className="flex flex-col items-center">
-              <h1>66</h1>
+              <h1>{followingno}</h1>
               <h1>Following</h1>
             </div>
           </div>
@@ -132,6 +182,7 @@ const UserProfile = () => {
             <button
               type="button"
               className="bg-blue-800 text-white p-2 px-4 capitalize rounded-lg hover:opacity-90"
+              onClick={follow}
             >
               Follow
             </button>

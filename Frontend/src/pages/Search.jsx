@@ -57,13 +57,13 @@ const Search = () => {
         return;
       }
       setloadingsearch(false);
-      console.log(data);
       setserachResults(data.users);
     } catch (error) {
       setloadingsearch(false);
       toast.error(error.message);
     }
   };
+
 
   return (
     <div className="md:w-[90vw] md:ml-[10vw] lg:w-[80vw] lg:ml-[20vw] md:px-0 py-4 mb-12 md:mb-0 h-fit px-2">
@@ -142,14 +142,6 @@ const Search = () => {
                 {user.username}
               </h1>
             </Link>
-          </div>
-          <div>
-            <button
-              type="button"
-              className="bg-blue-800 text-white p-1 px-2 capitalize rounded-lg hover:opacity-90"
-            >
-              Follow
-            </button>
           </div>
         </div>
       ))}

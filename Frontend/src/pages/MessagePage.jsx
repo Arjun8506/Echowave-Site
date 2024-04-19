@@ -64,7 +64,7 @@ const MessagePage = () => {
       if (data.message === 0) {
         return;
       } else {
-        setmessages(prevMessages => {
+        setmessages((prevMessages) => {
           const allMessages = [...prevMessages, ...data.message]
             .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
             .reverse();
@@ -94,7 +94,7 @@ const MessagePage = () => {
         toast.error(data.message);
         return;
       }
-      setmessages(prevMessages => {
+      setmessages((prevMessages) => {
         const allMessages = [...prevMessages, ...data.message]
           .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
           .reverse();
@@ -108,11 +108,25 @@ const MessagePage = () => {
     }
   };
 
+  const getLatestMessage = async ()=> {
+    try {
+      const res = await fetch(`/api/message/getlatestmessage/${user._id}`)
+      const data = await res.json()
+      if (data.success === false) {
+        toast.error(data.message);
+        return;
+      }
+      console.log(data);
+    } catch (error) {
+      toast.error(error.message)
+    }
+  }
+
   const messageContainerRef = useRef(null);
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]); // Scroll to bottom whenever messages change
+  }, [messages]); 
 
   const scrollToBottom = () => {
     if (messageContainerRef.current) {
@@ -122,22 +136,21 @@ const MessagePage = () => {
   };
 
   function useListenMessages() {
-    const {socket} = useSocketContext();
-  
+    const { socket } = useSocketContext();
+
     useEffect(() => {
       socket?.on("newMessage", (newMessage) => {
-        setmessages(prevMessages => [...prevMessages, newMessage]);
-      })
-  
-      return () => socket?.off("newMessage")
-    }, [socket, setmessages, messages])
-    
+        setmessages((prevMessages) => [...prevMessages, newMessage]);
+      });
+
+      return () => socket?.off("newMessage");
+    }, [socket, setmessages, messages]);
   }
 
-  useListenMessages()
+  useListenMessages();
 
   return (
-    <div className="md:w-[90vw] md:ml-[10vw] lg:w-[80vw] lg:ml-[20vw] h-screen md:overflow-x-hidden px-2">
+    <div className="md:w-[90vw] md:ml-[10vw] lg:w-[80vw] lg:ml-[20vw] h-screen md:overflow-x-hidden">
       <div className="w-full h-screen bg-black/50">
         <div className=" fixed z-50 w-full md:w-[90vw] lg:w-[80vw] py-2 px-2 flex justify-between items-center bg-zinc-200 rounded-b-lg">
           <div className=" flex items-center gap-2 ">
@@ -204,6 +217,7 @@ const MessagePage = () => {
                 className=" absolute right-4 p-1  bg-zinc-300 w-fit h-fit rounded-lg hover:opacity-80 text-lg disabled:opacity-50"
                 disabled={loadingWhileSending}
                 id="clickmetosend"
+                onClick={() => getLatestMessage()}
               >
                 {loadingWhileSending ? <FaSpinner /> : <LuSend />}
               </button>

@@ -11,6 +11,7 @@ import postRoutes from './routes/post.routes.js'
 import userRoutes from './routes/user.routes.js'
 import messageRoutes from "./routes/message.routes.js"
 import commentRoutes from "./routes/comment.routes.js"
+import followRoutes from "./routes/follow.routes.js"
 import path from "path"
 
 dotenv.config()
@@ -33,6 +34,8 @@ app.use("/api/user", userRoutes)
 app.use("/api/message", messageRoutes)
 
 app.use("/api/comment", commentRoutes)
+
+app.use("/api/followroute", followRoutes)
 
 const server = http.createServer(app)
 

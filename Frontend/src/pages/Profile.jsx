@@ -170,7 +170,6 @@ const Profile = () => {
         return;
       }
       setloading(false)
-      console.log(data);
       localStorage.setItem('chat-user', JSON.stringify(data.user));
       const updatedUserData = { 
         username: data.user.username,
@@ -185,6 +184,33 @@ const Profile = () => {
       toast.error(error.message);
     }
   };
+
+  const [following, setfollowing] = useState(0)
+
+  const followingList = async () => {
+    try {
+      const res = await fetch("/api/followroute/following")
+      const data = await res.json()
+
+      if (data.success === false) {
+        toast.error(data.message);
+        return;
+      }
+      if (data.followingCount === 0){
+        return
+      }else{
+        setfollowing(data.followingCount)
+      }
+
+    } catch (error) {
+      toast.error(error.message)
+    }
+  }
+
+  useEffect(() => {
+    followingList
+  }, [])
+  
 
   return (
     <div className="w-full overflow-hidden md:w-[90vw] md:ml-[8vw] lg:w-[80vw] lg:ml-[18vw] py-5 px-2">
@@ -232,7 +258,7 @@ const Profile = () => {
           </div>
           <div className="flex mb-2 items-center mx-16 gap-5 md:gap-7">
             <div className="flex flex-col items-center">
-              <h1>6</h1>
+              <h1>{userPosts.length}</h1>
               <h1>Posts</h1>
             </div>
             <div className="flex flex-col items-center">
@@ -240,7 +266,7 @@ const Profile = () => {
               <h1>Follwers</h1>
             </div>
             <div className="flex flex-col items-center">
-              <h1>66</h1>
+              <h1>{following}</h1>
               <h1>Following</h1>
             </div>
           </div>
